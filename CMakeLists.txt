@@ -2,14 +2,19 @@ cmake_minimum_required(VERSION 3.15)
 
 project(tuilib)
 
-find_program(CCACHE_BINARY ccache)
-if(CCACHE_BINARY)
-	set(CMAKE_C_COMPILER_LAUNCHER ${CCACHE_BINARY} CACHE FILEPATH "C compiler cache used")
-	set(CMAKE_CXX_COMPILER_LAUNCHER ${CCACHE_BINARY} CACHE FILEPATH "CXX compiler cache used")
-else()
-	message(WARNING "ccache not found")
-endif()
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+file(CREATE_LINK ${CMAKE_CURRENT_BINARY_DIR}/compile_commands.json ${CMAKE_SOURCE_DIR}/compile_commands.json SYMBOLIC)
 
+find_program(CCACHE_PROGRAM ccache)
+if(CCACHE_PROGRAM)
+    message(STATUS "Found ccache in ${CCACHE_PROGRAM}")
+    #set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
+    #set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ${CCACHE_PROGRAM})
+    set(CMAKE_CXX_COMPILER_LAUNCHER ${CCACHE_PROGRAM} ${CMAKE_CXX_COMPILER_LAUNCHER})
+    set(CMAKE_C_COMPILER_LAUNCHER ${CCACHE_PROGRAM} ${CMAKE_C_COMPILER_LAUNCHER})
+else()
+    message(STATUS "Install ccache to speed up compilation")
+endif()
 
 add_library(tuilib)
 
@@ -29,9 +34,8 @@ target_include_directories(tuilib
 include(FetchContent)
 FetchContent_Declare(
   googletest
-  # Specify the commit you depend on and update it regularly.
-  URL https://github.com/google/googletest/releases/download/v1.17.0/googletest-1.17.0.tar.gz
-  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+  GIT_REPOSITORY https://github.com/google/googletest.git
+  GIT_TAG        v1.17.0
 )
 # For Windows: Prevent overriding the parent project's compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
