@@ -18,21 +18,18 @@ else()
   message(STATUS "Install ccache to speed up compilation")
 endif()
 
-add_library(tuilib)
+add_library(tuilib INTERFACE)
 
 target_sources(tuilib
- PUBLIC
- include/tuilib/hello.h
- PRIVATE
- src/hello.cpp
+ INTERFACE
+ include/tuilib/line.h
+ include/tuilib/border.h
 )
 target_include_directories(tuilib
- PUBLIC
+ INTERFACE
  include/
- PRIVATE
- src/
 )
-target_compile_features(tuilib PUBLIC cxx_std_23)
+target_compile_features(tuilib INTERFACE cxx_std_23)
 
 include(CTest)
 
@@ -50,8 +47,7 @@ include(GoogleTest)
 add_executable(tuilibtests)
 target_sources(tuilibtests
  PRIVATE
- tests/hello_test.cpp
- tests/another_test.cpp
+ tests/border_test.cpp
 )
 target_link_libraries(tuilibtests PRIVATE tuilib gtest_main)
 gtest_discover_tests(tuilibtests)
