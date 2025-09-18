@@ -30,9 +30,21 @@ target_include_directories(tuilib
  include/
 )
 target_compile_features(tuilib INTERFACE cxx_std_23)
+target_compile_options(tuilib
+  INTERFACE
+  -Wall
+  -Wextra
+  -Wpedantic
+  -Wconversion
+  -Wunused
+  -Werror
+)
+
+add_executable(sample)
+target_sources(sample PRIVATE sample/main.cpp)
+target_link_libraries(sample PRIVATE tuilib)
 
 include(CTest)
-
 include(FetchContent)
 FetchContent_Declare(
   googletest
