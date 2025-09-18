@@ -1,13 +1,57 @@
+#include <algorithm>
 #include <cassert>
 #include <print>
+#include <random>
+#include <ranges>
 #include <thread>
+#include <vector>
+
+auto random_value(size_t begin, size_t end) -> size_t {
+    std::random_device r;
+    std::default_random_engine e(r());
+    std::uniform_int_distribution<size_t> uniform_dist(begin, end);
+    return uniform_dist(e);
+}
+
+auto multiple_progress_bar(size_t count) {
+    std::vector<size_t> all_progress(count, 0);
+    const auto new_lines = std::string(count, '\n');
+    std::fputs(new_lines.c_str(), stdout);
+    const auto not_finished = [](auto v) { return v < 100; };
+    while (std::ranges::any_of(all_progress, not_finished)) {
+        auto unfinished = all_progress | std::views::enumerate |
+                          std::views::filter([](const auto& tuple) {
+                              const auto& value = std::get<1>(tuple);
+                              assert(value <= 100);
+                              return value < 100;
+                          }) |
+                          std::ranges::to<std::vector>();
+        assert(!unfinished.empty());
+        const auto unfinished_size = unfinished.size();
+        const auto random_index = random_value(0, unfinished_size - 1);
+        const auto& [i, v] = unfinished[random_index];
+        all_progress[(size_t)i] += 1;
+
+        // draw the progress bar
+        std::print("\u001b[1000D");       // move left
+        std::print("\u001b[{}A", count);  // move up
+        for (const auto& p : all_progress) {
+            const auto width = p / 4;
+            assert(width <= 25);
+            const auto bar = std::string(width, '#');
+            std::print("[{:<25}]\n", bar);
+            std::fflush(stdout);
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+}
 
 /*
  * Inspired by
  * https://www.lihaoyi.com/post/BuildyourownCommandLinewithANSIescapecodes.html
  */
 
-auto main() -> int {
+auto first_steps() {
     constexpr auto NEWLINE = "\u001bE";
     constexpr auto RESET = "\u001b[0m";
 
@@ -56,7 +100,11 @@ auto main() -> int {
         const auto bar = std::string(width, '#');
         std::print("\u001b[1000D[{:<25}]", bar);
         std::fflush(stdout);
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
     std::fputs(NEWLINE, stdout);
+}
+
+auto main() -> int {
+    multiple_progress_bar(6);
 }
