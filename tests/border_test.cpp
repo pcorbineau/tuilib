@@ -4,6 +4,7 @@
 #include <format>
 #include <string>
 
+namespace {
 auto render(const auto& set) -> std::string {
     return std::format(
         "░░░░░░"
@@ -17,6 +18,7 @@ auto render(const auto& set) -> std::string {
         set.vertical_right, set.bottom_left, set.horizontal_bottom,
         set.horizontal_bottom, set.bottom_right);
 }
+}  // namespace
 
 TEST(BorderTests, Plain) {
     constexpr auto expected =

@@ -3,8 +3,8 @@
 #include <string_view>
 #include "tuilib/line.h"
 
-namespace tuilib {
-namespace border {
+
+namespace tuilib::border {
 struct Set {
     std::string_view top_left;
     std::string_view top_right;
@@ -18,11 +18,11 @@ struct Set {
 
 constexpr auto plain() -> Set {
     return {
-        line::TOP_LEFT, line::TOP_RIGHT, line::BOTTOM_LEFT, line::BOTTOM_RIGHT,
-        line::VERTICAL, line::VERTICAL,  line::HORIZONTAL,  line::HORIZONTAL,
+        .top_left=line::TOP_LEFT, .top_right=line::TOP_RIGHT, .bottom_left=line::BOTTOM_LEFT, .bottom_right=line::BOTTOM_RIGHT,
+        .vertical_left=line::VERTICAL, .vertical_right=line::VERTICAL,  .horizontal_top=line::HORIZONTAL,  .horizontal_bottom=line::HORIZONTAL,
     };
 }
 
 
-}  // namespace border
-}  // namespace tuilib
+} // namespace tuilib::border
+
